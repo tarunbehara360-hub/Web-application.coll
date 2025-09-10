@@ -1,0 +1,246 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Foodie — Food Delivery App (Demo)</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#ff6b6b; --glass: rgba(255,255,255,0.04);
+      --radius:14px; --max-width:1100px;
+      font-synthesis: none;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:#e6eef6;background:linear-gradient(180deg,#071227 0%, #04121b 100%);}
+    .app{max-width:var(--max-width);margin:28px auto;padding:24px;display:grid;grid-template-columns:1fr 360px;gap:22px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ff9a76);display:flex;align-items:center;justify-content:center;color:#081020;font-weight:800;font-size:18px;box-shadow:0 6px 18px rgba(0,0,0,0.5)}
+    h1{font-size:20px;margin:0}
+    .subtitle{color:var(--muted);font-size:13px}/* Search / controls */
+.controls{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+.search{flex:1;display:flex;align-items:center;background:var(--glass);padding:10px;border-radius:12px;backdrop-filter: blur(6px)}
+.search input{background:transparent;border:0;outline:0;color:inherit;font-size:14px;width:100%}
+.categories{display:flex;gap:8px;overflow:auto;padding-bottom:6px}
+.chip{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);cursor:pointer;font-size:13px;color:var(--muted)}
+.chip.active{background:linear-gradient(90deg, rgba(255,107,107,0.12), rgba(255,154,118,0.08));color:#fff;border-color:rgba(255,107,107,0.18)}
+
+/* Menu list */
+.menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.03);display:flex;gap:10px;align-items:center}
+.thumb{width:84px;height:84px;border-radius:10px;flex-shrink:0;background-size:cover;background-position:center;}
+.meta{flex:1}
+.meta h3{margin:0 0 6px 0;font-size:15px}
+.meta p{margin:0;font-size:13px;color:var(--muted)}
+.price-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.price{font-weight:700}
+.btn{padding:8px 10px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),#ff9a76);color:#081020;font-weight:700;cursor:pointer}
+
+/* Cart */
+.cart{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);height:fit-content}
+.cart h3{margin-top:0}
+.cart-list{max-height:420px;overflow:auto;margin-top:10px}
+.cart-item{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.02)}
+.qty{display:flex;align-items:center;gap:6px}
+.small-btn{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:4px;border-radius:8px;cursor:pointer}
+.checkout{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.total-row{display:flex;justify-content:space-between;color:#fff;font-weight:700}
+.pay-btn{background:linear-gradient(90deg,#12c2e9,#c471ed);border:0;padding:12px;border-radius:12px;color:#081020;font-weight:800;cursor:pointer}
+
+/* Empty */
+.empty{color:var(--muted);text-align:center;padding:40px 10px;border-radius:10px}
+
+/* Responsive */
+@media (max-width:980px){.app{grid-template-columns:1fr;}.cart{order:2;margin-top:10px}}
+
+/* micro interactions */
+.pill{font-size:12px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.03);display:inline-block}
+a.link{color:var(--accent);text-decoration:none}
+
+  </style>
+</head>
+<body>
+  <div class="app" role="application">
+    <main>
+      <header>
+        <div class="logo">FD</div>
+        <div>
+          <h1>Foodie — Fast home delivery</h1>
+          <div class="subtitle">Fresh, hot food delivered to your door</div>
+        </div>
+      </header><div class="controls">
+    <div class="search" role="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.7;margin-right:8px"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.6"></circle></svg>
+      <input id="search" placeholder="Search dishes or restaurants..." aria-label="Search dishes" />
+    </div>
+    <div style="min-width:120px;">Delivery • <span class="pill">ASAP</span></div>
+  </div>
+
+  <div class="categories" id="categories" aria-hidden="false" style="margin-bottom:14px">
+    <!-- chips inserted by JS -->
+  </div>
+
+  <section>
+    <div id="menu" class="menu" aria-live="polite">
+      <!-- food cards injected by JS -->
+    </div>
+  </section>
+</main>
+
+<aside class="cart" aria-label="Shopping cart">
+  <h3>Your order</h3>
+  <div class="subtitle">Items in cart</div>
+  <div class="cart-list" id="cart-list">
+    <div class="empty" id="cart-empty">Your cart is empty — add delicious items from the menu.</div>
+  </div>
+
+  <div class="checkout" aria-hidden="false">
+    <div class="total-row"><div>Subtotal</div><div id="subtotal">₹0.00</div></div>
+    <div class="total-row"><div>Delivery</div><div id="delivery">₹40.00</div></div>
+    <div class="total-row" style="font-size:18px;margin-top:6px"><div>Total</div><div id="total">₹0.00</div></div>
+    <button id="checkout-btn" class="pay-btn" disabled>Checkout</button>
+  </div>
+</aside>
+
+  </div>  <script>
+    // --- Demo data ---
+    const data = [
+      {id:1,name:'Margherita Pizza',desc:'Classic cheese, tomato & basil',price:299,cat:'Pizza',img:'https://images.unsplash.com/photo-1601924582975-9e5f6f14b7a9?w=800&q=80'},
+      {id:2,name:'Paneer Butter Masala',desc:'Creamy tomato curry with cottage cheese',price:189,cat:'Indian',img:'https://images.unsplash.com/photo-1604908177224-1c8b0f0a8a3b?w=800&q=80'},
+      {id:3,name:'Sushi Platter',desc:'Assorted sushi with soy & wasabi',price:699,cat:'Japanese',img:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&q=80'},
+      {id:4,name:'Veg Burger',desc:'Crispy patty, lettuce, tomato & special sauce',price:149,cat:'Burgers',img:'https://images.unsplash.com/photo-1617191512511-6e0b8d4f9f9d?w=800&q=80'},
+      {id:5,name:'Caesar Salad',desc:'Romaine, parmesan, croutons & Caesar dressing',price:169,cat:'Salads',img:'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=800&q=80'},
+      {id:6,name:'Butter Chicken',desc:'Rich buttery tomato gravy with tender chicken',price:259,cat:'Indian',img:'https://images.unsplash.com/photo-1604908176901-7b5f5a8b1d2c?w=800&q=80'},
+      {id:7,name:'Pepperoni Pizza',desc:'Loads of pepperoni and cheese',price:349,cat:'Pizza',img:'https://images.unsplash.com/photo-1548365328-8b7cae9d8b89?w=800&q=80'},
+      {id:8,name:'Ramen Bowl',desc:'Savory broth with noodles and soft egg',price:329,cat:'Japanese',img:'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=800&q=80'},
+      {id:9,name:'Fries (Large)',desc:'Crispy golden fries',price:99,cat:'Sides',img:'https://images.unsplash.com/photo-1585238342029-25b1b7f2e8b4?w=800&q=80'}
+    ];
+
+    // --- App state ---
+    const state = {query:'',cat:'All',cart:{}};
+
+    // --- Helpers ---
+    const toINR = v => '₹' + v.toFixed(2);
+
+    // --- Render categories ---
+    function renderCategories(){
+      const cats = ['All', ...new Set(data.map(d=>d.cat))];
+      const container = document.getElementById('categories');
+      container.innerHTML='';
+      cats.forEach(c=>{
+        const el = document.createElement('button');
+        el.className='chip' + (state.cat===c ? ' active' : '');
+        el.textContent = c;
+        el.onclick = ()=>{ state.cat = c; renderMenu(); renderCategories(); }
+        container.appendChild(el);
+      })
+    }
+
+    // --- Render menu ---
+    function renderMenu(){
+      const menu = document.getElementById('menu');
+      menu.innerHTML='';
+      const q = state.query.trim().toLowerCase();
+      const items = data.filter(item=>{
+        if(state.cat!=='All' && item.cat!==state.cat) return false;
+        if(!q) return true;
+        return item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) || item.cat.toLowerCase().includes(q);
+      });
+      if(items.length===0){
+        menu.innerHTML = '<div class="empty" style="grid-column:1/-1">No items match your search.</div>';
+        return;
+      }
+      items.forEach(item=>{
+        const c = document.createElement('article'); c.className='card';
+        const img = document.createElement('div'); img.className='thumb'; img.style.backgroundImage = `url('${item.img}')`;
+        const meta = document.createElement('div'); meta.className='meta';
+        meta.innerHTML = `<h3>${item.name}</h3><p>${item.desc}</p>`;
+        const bottom = document.createElement('div'); bottom.className='price-row';
+        bottom.innerHTML = `<div class="price">${toINR(item.price)}</div>`;
+        const btn = document.createElement('button'); btn.className='btn'; btn.textContent='Add';
+        btn.onclick = ()=>{ addToCart(item.id) }
+        bottom.appendChild(btn);
+        meta.appendChild(bottom);
+        c.appendChild(img); c.appendChild(meta);
+        menu.appendChild(c);
+      })
+    }
+
+    // --- Cart functions ---
+    function addToCart(id){
+      const item = data.find(d=>d.id===id);
+      if(!item) return;
+      if(!state.cart[id]) state.cart[id] = { ...item, qty:0 };
+      state.cart[id].qty += 1;
+      persist(); renderCart();
+      // small animation notification (optional)
+    }
+    function changeQty(id,delta){
+      if(!state.cart[id]) return;
+      state.cart[id].qty += delta;
+      if(state.cart[id].qty <= 0) delete state.cart[id];
+      persist(); renderCart();
+    }
+
+    function renderCart(){
+      const list = document.getElementById('cart-list');
+      list.innerHTML='';
+      const ids = Object.keys(state.cart);
+      if(ids.length===0){ document.getElementById('cart-empty').style.display='block'; document.getElementById('checkout-btn').disabled = true; updateTotals(); return; }
+      document.getElementById('cart-empty').style.display='none';
+      ids.forEach(k=>{
+        const it = state.cart[k];
+        const row = document.createElement('div'); row.className='cart-item';
+        const left = document.createElement('div'); left.style.flex='1'; left.innerHTML = `<div style="font-weight:700">${it.name}</div><div style="font-size:13px;color:var(--muted);">${toINR(it.price)} each</div>`;
+        const right = document.createElement('div'); right.style.textAlign='right';
+        const qty = document.createElement('div'); qty.className='qty';
+        const minus = document.createElement('button'); minus.className='small-btn'; minus.textContent='−'; minus.onclick = ()=>changeQty(it.id,-1);
+        const plus = document.createElement('button'); plus.className='small-btn'; plus.textContent='+'; plus.onclick = ()=>changeQty(it.id,1);
+        const qtxt = document.createElement('div'); qtxt.textContent = it.qty; qtxt.style.minWidth='22px'; qtxt.style.textAlign='center';
+        qty.appendChild(minus); qty.appendChild(qtxt); qty.appendChild(plus);
+        const subtotal = document.createElement('div'); subtotal.style.marginTop='8px'; subtotal.textContent = toINR(it.qty * it.price);
+        right.appendChild(qty); right.appendChild(subtotal);
+        row.appendChild(left); row.appendChild(right);
+        list.appendChild(row);
+      })
+      document.getElementById('checkout-btn').disabled = false;
+      updateTotals();
+    }
+
+    function updateTotals(){
+      const subtotal = Object.values(state.cart).reduce((s,i)=>s + i.qty * i.price, 0);
+      const delivery = subtotal > 0 ? 40 : 0;
+      document.getElementById('subtotal').textContent = toINR(subtotal);
+      document.getElementById('delivery').textContent = toINR(delivery);
+      document.getElementById('total').textContent = toINR(subtotal + delivery);
+    }
+
+    // --- Persistence (localStorage simple demo) ---
+    function persist(){
+      try{ localStorage.setItem('foodie-cart', JSON.stringify(state.cart)); }catch(e){ /* ignore */ }
+    }
+    function restore(){
+      try{ const raw = localStorage.getItem('foodie-cart'); if(raw) state.cart = JSON.parse(raw); }catch(e){ state.cart = {} }
+    }
+
+    // --- Search handler ---
+    document.getElementById('search').addEventListener('input', e=>{ state.query = e.target.value; renderMenu(); });
+
+    // --- Checkout ---
+    document.getElementById('checkout-btn').addEventListener('click', ()=>{
+      const subtotal = Object.values(state.cart).reduce((s,i)=>s + i.qty * i.price, 0);
+      if(subtotal===0) return alert('Your cart is empty');
+      const total = subtotal + 40;
+      // Demo checkout flow: show a summary and clear cart
+      if(confirm(`Proceed to checkout?\n\nSubtotal: ${toINR(subtotal)}\nDelivery: ₹40.00\nTotal: ${toINR(total)}`)){
+        // in real app, send to backend
+        alert('Order placed! (demo)');
+        state.cart = {}; persist(); renderCart();
+      }
+    })
+
+    // --- Init ---
+    (function init(){ restore(); renderCategories(); renderMenu(); renderCart(); })();
+
+  </script></body>
+</html>
